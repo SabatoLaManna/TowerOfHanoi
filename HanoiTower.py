@@ -168,19 +168,15 @@ while True:
     hand_infos, results = detect_hand_position_and_gesture(raw_img)
 
     img = cv2.flip(img, 1)  # Mirror *after* hand detection
-
     if hand_infos and not won:
         main_hand = hand_infos[0]
         x_history.append(main_hand['x'])
         smoothed_x = sum(x_history) / len(x_history)
         holding_pos_x = smoothed_x
-
         peg_index = get_peg_from_x(smoothed_x)
-
         if not holding_disc and main_hand['closed'] and discs[peg_index]:
             holding_disc = discs[peg_index].pop()
             holding_from = peg_index
-
         if holding_disc and not main_hand['closed']:
             if not discs[peg_index] or holding_disc < discs[peg_index][-1]:
                 discs[peg_index].append(holding_disc)
@@ -194,14 +190,11 @@ while True:
                 discs[holding_from].append(holding_disc)
                 holding_disc = None
                 holding_from = None
-
     # Draw hand wireframe
     if results.multi_hand_landmarks:
         for hand_landmarks in results.multi_hand_landmarks:
             for landmark in hand_landmarks.landmark:
                 landmark.x = 1 - landmark.x
             mp_draw.draw_landmarks(img, hand_landmarks, mp_hands.HAND_CONNECTIONS)
-
     draw_game(frame=img)
-
     clock.tick(30)
